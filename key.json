@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "metrology-f7717",
+  "private_key_id": "af4efcee35176a83869bea2e4c9e52ebb0034170",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCWHgIueBP69LZo\nWp+HAmZyvA5v6XUlDAQYPBh2L8+Ez3ViU7el+xGfVA2c9CSSszAr+uBtQ+Hdsj0f\nDUsoA/LJGRETq9R6mVzLFLzhCcTeCVi33hlmHaneAZ7BuiJK8HKnQXZPVQ0K6Wd6\nMcakZZm8kXmnXO9w/iPJSqDFEqbmUrtlPLl/YcOynofhpprUwdNMDxCzXt3uD3h/\noguOx+SqanN07ToYMRwV9N1Sb7euT7090G2PAmnh5+DadwFsAscDjD2MZyJnbsCh\nEaTGpKYdtwifgkD8MoXdaqME31oH372+PslR+RLgcD554ZgWl6iY5Pqqp4CiuW+A\nSyRFRQG3AgMBAAECggEADLXbv22BW5VOwIUzzq2gWQSdQFKHDaz3x8mG1LL1oiwi\np0GpYg9hDZmDUY/GbPlpEcA7MmU2AZxu2ms4utmiu+44aO76narQlY1a9L7sAVTP\nQzo18lR+poKCm6qT7r5vJsQ/LTZpVUwv68O9KvxDSRkUMNyIlYufIhMEi8spgITN\nfhaSpBgyBPmZkOTWDm9AYozb+XlG6BelfwW0XynwNLQXbbmP+k6eL1Xa+Ao8in1q\nhzoWSbn6QY3GFxnhAzdztBTSReyVFOcRuouEZYeiu1jQIaRWICwLpY7HEqmvFNAk\nBnTNMZm94XiAd2jCfPoKCLOmEpYQV3d+Bz4PyExVqQKBgQDRcMk0Bx78T8CFXiQL\nX6+HUA/LoRTWQUStXxhPbfYTpMxf1N+yQ5PULoOP2hUT0peOEsDP1xWjJ4+HWZ8i\naqNh8J9LbEgk0xFejXS/enRLUHC3yNF+iMrF7BmmLjzau1vAV5kBR6KGxBC8CEId\n0BPuzM9YEHDDw6FMvlKsaU8udQKBgQC3fSUDVwFmrjjqdHOdeD2USULVIklGN1rA\nfD54r4uVM7z7C0ULRggPNP4jE9FRMq9TWqSy5xuyIJ+wnGMNsGKgv05F6teqm4I3\nJKvYj/V5ntaaK+ESs4Y09TfchiQxZqnfqbBcwl8PWn+fPF+WD397HMnM8WbQLWRf\nh2v82SQB+wKBgQDNAuEAm6PaCNsD8ZXIyF4STu1XPxMdcwAd0QMD5ThGHD+t4rsh\nTQLsZKeFbUzKfY66lGLGT9yvOy9EpxadYtMRMK9M7e5klXLgIglQ0TX67v+W9u0S\nNiZ+vNCSmZoZ5eI3EcgEt7FAx7U1ycOmWSLZ0wN3SYiIJ/vBGl/kwqSubQKBgQCd\n8wVMlbXoDOuDr5DiqeHgZxw32lbXMclWTt18CCkQ28O/GxlpNfS0Gnr1+RZDXm0c\nRLfoJRdrQ7gTUNvXqdGM7IFVoG3cOBdknpWrS2kVM40qk8Eg1xcdOUXH+FTpjaWH\nmkvt3Yf08INRsKfbxiWH9eUlHVzSsXBo52sm8kiTxwKBgGFuTzLedqXuc7/G3kOj\nSyL2dA86ZFg9h6wWDQ819lCE4M+g+EvhE3fcSTD4RjXIlqFFVhTZ1BdkvrgdjfQf\n6BFCphmKh5InaHOmroQ456KuptsSy/z3yS4RnlzKYSUmJuJfvbNfGsnig5KYYrwD\nVRUKL297KPtjfKnYO9UVpT4O\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-zx6sp@metrology-f7717.iam.gserviceaccount.com",
+  "client_id": "110024021575880779517",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zx6sp%40metrology-f7717.iam.gserviceaccount.com"
+}
