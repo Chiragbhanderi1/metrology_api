@@ -36,6 +36,24 @@ app.get('/getproducts', async (req, res) => {
     res.status(500).json({ error: 'Failed to get products' });
   }
 });
+app.get('/getproducts/:category/:subcategory/:subsubcategory', async (req, res) => {
+  try {
+    const category = req.params.category;
+    const subcategory = req.params.subcategory;
+    const subsubcategory = req.params.subsubcategory;
+    const snapshot = await admin.firestore().collection('products').get();
+    const products = [];
+    snapshot.forEach(doc => {
+      if (doc.data().category===category && doc.data().subcategory===subcategory && doc.data().subsubcategory===subsubcategory) {        
+        products.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get products' });
+  }
+});
 
 // Get a single product from the Firebase database
 app.get('/getproduct/:id', async (req, res) => {
