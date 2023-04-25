@@ -24,15 +24,15 @@ app.post('/products', async (req, res) => {
     const title=req.body.title;
     const size=req.body.size;
     // Add a new category at level 1
-    const level1Ref = await db.collection(category).add({  categoryimg });
+    const level1Ref = await db.collection(category).add({  categoryimg:categoryimg,name:category });
     const level1Id = level1Ref.id;
 
     // Add a new category at level 2
-    const level2Ref = await level1Ref.collection(subcategory).add({  subcategoryimg });
+    const level2Ref = await level1Ref.collection(subcategory).add({  subcategoryimg:subcategoryimg,name:subcategory });
     const level2Id = level2Ref.id;
 
     // Add a new category at level 3
-    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg,title,size });
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -41,60 +41,117 @@ app.post('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to add product' });
   }
 });
-app.get('/categories', async (req, res) => {
+app.get('/getcatimg',async(req,res)=>{
   try {
-    const categoriesRef = db.collection('categories');
-    const snapshot = await categoriesRef.get();
-    const categories = [];
-    for (const doc of snapshot.docs) {
-      const level1Data = doc.data();
-      const level1Id = doc.id;
-      const category = {
-        id: level1Id,
-        image: level1Data.image,
-        subcategories: []
-      };
-      const subcategoriesRef = doc.ref.collection('subcategories');
-      const subSnapshot = await subcategoriesRef.get();
-      for (const subDoc of subSnapshot.docs) {
-        const level2Data = subDoc.data();
-        const level2Id = subDoc.id;
-        const subcategory = {
-          id: level2Id,
-          image: level2Data.image,
-          subcategories: []
-        };
-        const sub2categoriesRef = subDoc.ref.collection('subcategories');
-        const sub2Snapshot = await sub2categoriesRef.get();
-        for (const sub2Doc of sub2Snapshot.docs) {
-          const level3Data = sub2Doc.data();
-          const level3Id = sub2Doc.id;
-          const sub2category = {
-            id: level3Id,
-            name: level3Data.name,
-            products: level3Data.products,
-          };
-          subcategory.subcategories.push(sub2category);
-        }
-        category.subcategories.push(subcategory);
+    const collections = await db.listCollections();
+    // Loop through each collection and get the first document
+    const data = [];
+    for (const collectionRef of collections) {
+      const querySnapshot = await collectionRef.limit(1).get();
+      const docSnapshot = querySnapshot.docs[0];
+      if (docSnapshot) {
+        data.push({
+          collection: collectionRef.id,
+          data: docSnapshot.data().categoryimg,
+        });
       }
-
-      categories.push(category);
     }
-
-    res.status(200).json(categories);
+    res.json(data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).send(error)
   }
-});
-app.get('/getproduct/:categoryId/:subcategoryId/:productId', async (req, res) => {
+})
+app.get('/getsubcat/:categoryName',async(req,res)=>{
   try {
-    const categoryId = req.params.categoryId;
-    const subcategoryId = req.params.subcategoryId;
-    const productId = req.params.productId;
+    let collectionId =" ";    
+    const categoryName = req.params.categoryName;
+    // Get a reference to the specified collection
+    const collectionRef = db.collection(categoryName);
+    const data = await collectionRef.get();
+    data.forEach(doc =>{      
+        collectionId = doc.id;      
+    })
+    // Get all subcollections within the specified collection
+    const subcollections = await collectionRef.doc(collectionId).listCollections();
+    // Get the first document from each subcollection
+    const subcollectionDocs = await Promise.all(
+      subcollections.map(async (subcollectionRef) => {
+        const snapshot = await subcollectionRef.limit(1).get();
+        const doc = snapshot.docs[0];
+        if (!doc) {
+          return null;
+        }
+        return {
+          name: doc.data().name,
+          img: doc.data().subcategoryimg
+        };
+      })
+    );
 
-    const categoryRef = db.collection('categories').doc(categoryId);
+    res.json(subcollectionDocs.filter((doc) => doc !== null));
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+app.get('/getsubsubcat/:categoryName/:subcategoryName',async(req,res)=>{
+  try {
+    let collectionId =" ";    
+    let subcollectionId =" ";    
+    const categoryName = req.params.categoryName;
+    const subcategoryName =req.params.subcategoryName;
+    // Get a reference to the specified collection
+    const collectionRef = db.collection(categoryName);
+    const data = await collectionRef.get();
+    data.forEach(doc =>{      
+        collectionId = doc.id;      
+    })
+    const subcollectionRef = db.collection(categoryName).doc(collectionId).collection(subcategoryName);
+    const sdata = await subcollectionRef.get();
+    sdata.forEach(doc =>{      
+        subcollectionId = doc.id;      
+    })
+    // Get all subcollections within the specified collection
+    const subcollections = await subcollectionRef.doc(subcollectionId).listCollections();
+    // Get the first document from each subcollection
+    const subcollectionDocs = await Promise.all(
+      subcollections.map(async (subcollectionRef) => {
+        const snapshot = await subcollectionRef.limit(1).get();
+        const doc = snapshot.docs[0];
+        if (!doc) {
+          return null;
+        }
+        return {
+          name: doc.data().name,
+          img: doc.data().subsubcategoryimg
+        };
+      })
+    );
+
+    res.json(subcollectionDocs.filter((doc) => doc !== null));
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+app.get('/products/:categoryName/:subcategoryName/:subsubcategoryName', async (req, res) => {
+  try {
+    let categoryId =" ";    
+    let subcategoryId =" ";    
+    const categoryName = req.params.categoryName;
+    const subcategoryName =req.params.subcategoryName;
+    const subsubcategoryName = req.params.subsubcategoryName;
+    // Get a reference to the specified collection
+    const collectionRef = db.collection(categoryName);
+    const data = await collectionRef.get();
+    data.forEach(doc =>{      
+      categoryId = doc.id;      
+    })
+    const subcollectionRef = db.collection(categoryName).doc(categoryId).collection(subcategoryName);
+    const sdata = await subcollectionRef.get();
+    sdata.forEach(doc =>{      
+      subcategoryId = doc.id;      
+    })
+
+    const categoryRef = db.collection(categoryName).doc(categoryId);
     const categoryDoc = await categoryRef.get();
 
     if (!categoryDoc.exists) {
@@ -102,7 +159,7 @@ app.get('/getproduct/:categoryId/:subcategoryId/:productId', async (req, res) =>
       return;
     }
 
-    const subcategoryRef = categoryRef.collection('subcategories').doc(subcategoryId);
+    const subcategoryRef = categoryRef.collection(subcategoryName).doc(subcategoryId);
     const subcategoryDoc = await subcategoryRef.get();
 
     if (!subcategoryDoc.exists) {
@@ -110,47 +167,7 @@ app.get('/getproduct/:categoryId/:subcategoryId/:productId', async (req, res) =>
       return;
     }
 
-    const productRef = subcategoryRef.collection('subcategories').doc(productId);
-    const productDoc = await productRef.get();
-    if (!productDoc.exists) {
-      res.status(404).json({ error: 'Product not found' });
-      return;
-    }
-    const productData = productDoc.data();
-    const product = {
-      id: productId,
-      name: productData.name,
-      product:productData.products
-    };
-
-    res.status(200).json(product);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Something went wrong' });
-  }
-});
-app.get('/products/:categoryId/:subcategoryId', async (req, res) => {
-  try {
-    const categoryId = req.params.categoryId;
-    const subcategoryId = req.params.subcategoryId;
-
-    const categoryRef = db.collection('categories').doc(categoryId);
-    const categoryDoc = await categoryRef.get();
-
-    if (!categoryDoc.exists) {
-      res.status(404).json({ error: 'Category not found' });
-      return;
-    }
-
-    const subcategoryRef = categoryRef.collection('subcategories').doc(subcategoryId);
-    const subcategoryDoc = await subcategoryRef.get();
-
-    if (!subcategoryDoc.exists) {
-      res.status(404).json({ error: 'Subcategory not found' });
-      return;
-    }
-
-    const productsRef = subcategoryRef.collection('products');
+    const productsRef = subcategoryRef.collection(subsubcategoryName);
     const productsQuerySnapshot = await productsRef.get();
 
     const products = [];
@@ -158,10 +175,8 @@ app.get('/products/:categoryId/:subcategoryId', async (req, res) => {
       const productData = doc.data();
       const product = {
         id: doc.id,
-        name: productData.name,
-        image: productData.image,
-        price: productData.price,
-        description: productData.description
+        title:doc.data().title,
+        size:doc.data().size
       };
       products.push(product);
     });
