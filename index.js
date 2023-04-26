@@ -23,6 +23,7 @@ app.post('/products', async (req, res) => {
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
+    const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref = await db.collection(category).add({  categoryimg:categoryimg,name:category });
     const level1Id = level1Ref.id;
@@ -32,7 +33,7 @@ app.post('/products', async (req, res) => {
     const level2Id = level2Ref.id;
 
     // Add a new category at level 3
-    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -51,6 +52,7 @@ app.post('/subcatproducts', async (req, res) => {
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
+    const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref =  db.collection(category);
     const level1Id = await level1Ref.get();
@@ -61,7 +63,7 @@ app.post('/subcatproducts', async (req, res) => {
     const level2Ref = await level1Ref.doc(categoryId).collection(subcategory).add({  subcategoryimg:subcategoryimg,name:subcategory });
     const level2Id = level2Ref.id;
     // Add a new category at level 3
-    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -80,6 +82,7 @@ app.post('/subsubcatproducts', async (req, res) => {
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
+    const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref =  db.collection(category);
     const level1Id = await level1Ref.get();
@@ -94,7 +97,7 @@ app.post('/subsubcatproducts', async (req, res) => {
       subcategoryId = doc.id
     })
     // Add a new category at level 3
-    const level3Ref = await level2Ref.doc(subcategoryId).collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
+    const level3Ref = await level2Ref.doc(subcategoryId).collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -135,6 +138,7 @@ app.get('/getsubcat/:categoryName',async(req,res)=>{
     })
     // Get all subcollections within the specified collection
     const subcollections = await collectionRef.doc(collectionId).listCollections();
+    console.log(subcollections)
     // Get the first document from each subcollection
     const subcollectionDocs = await Promise.all(
       subcollections.map(async (subcollectionRef) => {
