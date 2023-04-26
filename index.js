@@ -41,6 +41,68 @@ app.post('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to add product' });
   }
 });
+app.post('/subcatproducts', async (req, res) => {
+  try {
+    let categoryId =" ";
+    const category = req.body.category;
+    const subcategory = req.body.subcategory;
+    const subcategoryimg = req.body.scimg;
+    const subsubcategory = req.body.subsubcategory;
+    const subsubcategoryimg = req.body.sscimg;
+    const title=req.body.title;
+    const size=req.body.size;
+    // Add a new category at level 1
+    const level1Ref =  db.collection(category);
+    const level1Id = await level1Ref.get();
+    level1Id.forEach(doc=>{
+      categoryId = doc.id
+    })
+    // Add a new category at level 2
+    const level2Ref = await level1Ref.doc(categoryId).collection(subcategory).add({  subcategoryimg:subcategoryimg,name:subcategory });
+    const level2Id = level2Ref.id;
+    // Add a new category at level 3
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
+    const level3Id = level3Ref.id;
+
+    res.status(201).json({ level1Id, level2Id, level3Id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add product' });
+  }
+});
+app.post('/subsubcatproducts', async (req, res) => {
+  try {
+    let categoryId =" ";
+    let subcategoryId =" ";
+    const category = req.body.category;
+    const subcategory = req.body.subcategory;
+    const subsubcategory = req.body.subsubcategory;
+    const subsubcategoryimg = req.body.sscimg;
+    const title=req.body.title;
+    const size=req.body.size;
+    // Add a new category at level 1
+    const level1Ref =  db.collection(category);
+    const level1Id = await level1Ref.get();
+    level1Id.forEach(doc=>{
+      categoryId = doc.id
+    })
+    // Add a new category at level 2
+    const level2Ref =  level1Ref.doc(categoryId).collection(subcategory);
+    // const level2Id = level2Ref.id;
+    const level2Id = await level2Ref.get();
+    level2Id.forEach(doc=>{
+      subcategoryId = doc.id
+    })
+    // Add a new category at level 3
+    const level3Ref = await level2Ref.doc(subcategoryId).collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
+    const level3Id = level3Ref.id;
+
+    res.status(201).json({ level1Id, level2Id, level3Id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add product' });
+  }
+});
 app.get('/getcatimg',async(req,res)=>{
   try {
     const collections = await db.listCollections();
