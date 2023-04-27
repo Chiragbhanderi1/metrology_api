@@ -242,7 +242,8 @@ app.get('/products/:categoryName/:subcategoryName/:subsubcategoryName', async (r
       const product = {
         id: doc.id,
         title:doc.data().title,
-        size:doc.data().size
+        size:doc.data().size,
+        productImg:doc.data().productImg,
       };
       products.push(product);
     });
