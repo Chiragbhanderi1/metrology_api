@@ -291,7 +291,7 @@ app.post('/file', upload.single('file'), async (req, res) => {
     const file = req.file;  
   // Upload the file to Firebase Storage
   const folderName = 'Images';
-  const bucket = admin.storage().bucket();
+  const bucket = admin.storage().bucket('gs://metrology-f7717.appspot.com');
   const fileName = `${folderName}/${file.originalname}`;
   const fileUpload = bucket.file(fileName);
 
