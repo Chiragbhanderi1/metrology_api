@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 const serviceAccount = require('./key.json');
-
+const multer = require('multer');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: 'https://metrology-f7717-default-rtdb.asia-southeast1.firebasedatabase.app/'
@@ -12,28 +12,67 @@ const db = admin.firestore();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+const upload = multer({ 
+  storage: multer.memoryStorage().storage,
+  limits: { 
+    fileSize: 100 * 1024 * 1024, // 100MB in bytes
+    fieldSize: 100 * 1024 * 1024, // 100MB in bytes
+    parts: 100, // Increase this if your upload involves multiple parts
+    files: 1 // Increase this if you're uploading multiple files simultaneously
+  }
+});
+
+
 // Add a new product to the Firebase database
+app.post('/inqury',async(req,res)=>{
+    try{
+      const data = {name:req.body.name,email:req.body.email,category:req.body.category,subcategory:req.body.subcategory,subsubcategory:req.body.subsubcategory,productname:req.body.productname,productsize:req.body.productsize,quantity:req.body.quantity,contact:req.body.contact,created_on:new Date()};
+      const response = await db.collection("inqury").doc().set(data)
+      res.send(response)
+    }catch(err){
+        res.send(err)
+    }
+})
+app.get('/getinqury',async(req,res)=>{
+    try{
+        const contact =  db.collection("inqury");
+        const data = await contact.get();
+        const contactArray = [];
+        if(data.empty) {
+            res.status(404).send('No Inqury record found');
+        }else {
+            data.forEach(doc => {
+                const document = doc.data();
+                document.id = doc.id;
+                contactArray.push(document);
+            });
+            res.send(contactArray);
+        }
+    }catch(err){
+        res.send(err)
+    }
+})
 app.post('/products', async (req, res) => {
   try {
     const category = req.body.category;
     const categoryimg = req.body.cimg;
     const subcategory = req.body.subcategory;
-    const subcategoryimg = req.body.scimg;
+    // const subcategoryimg = req.body.scimg;
     const subsubcategory = req.body.subsubcategory;
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
-    const productImg = req.body.productImg;
+    // const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref = await db.collection(category).add({  categoryimg:categoryimg,name:category });
     const level1Id = level1Ref.id;
 
     // Add a new category at level 2
-    const level2Ref = await level1Ref.collection(subcategory).add({  subcategoryimg:subcategoryimg,name:subcategory });
+    const level2Ref = await level1Ref.collection(subcategory).add({  name:subcategory });
     const level2Id = level2Ref.id;
 
     // Add a new category at level 3
-    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -47,12 +86,12 @@ app.post('/subcatproducts', async (req, res) => {
     let categoryId =" ";
     const category = req.body.category;
     const subcategory = req.body.subcategory;
-    const subcategoryimg = req.body.scimg;
+    // const subcategoryimg = req.body.scimg;
     const subsubcategory = req.body.subsubcategory;
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
-    const productImg = req.body.productImg;
+    // const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref =  db.collection(category);
     const level1Id = await level1Ref.get();
@@ -60,10 +99,10 @@ app.post('/subcatproducts', async (req, res) => {
       categoryId = doc.id
     })
     // Add a new category at level 2
-    const level2Ref = await level1Ref.doc(categoryId).collection(subcategory).add({  subcategoryimg:subcategoryimg,name:subcategory });
+    const level2Ref = await level1Ref.doc(categoryId).collection(subcategory).add({ name:subcategory });
     const level2Id = level2Ref.id;
     // Add a new category at level 3
-    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
+    const level3Ref = await level2Ref.collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory});
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -82,7 +121,7 @@ app.post('/subsubcatproducts', async (req, res) => {
     const subsubcategoryimg = req.body.sscimg;
     const title=req.body.title;
     const size=req.body.size;
-    const productImg = req.body.productImg;
+    // const productImg = req.body.productImg;
     // Add a new category at level 1
     const level1Ref =  db.collection(category);
     const level1Id = await level1Ref.get();
@@ -97,7 +136,7 @@ app.post('/subsubcatproducts', async (req, res) => {
       subcategoryId = doc.id
     })
     // Add a new category at level 3
-    const level3Ref = await level2Ref.doc(subcategoryId).collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory,productImg:productImg });
+    const level3Ref = await level2Ref.doc(subcategoryId).collection(subsubcategory).add({  subsubcategoryimg:subsubcategoryimg,title:title,size:size,name:subsubcategory });
     const level3Id = level3Ref.id;
 
     res.status(201).json({ level1Id, level2Id, level3Id });
@@ -148,8 +187,7 @@ app.get('/getsubcat/:categoryName',async(req,res)=>{
           return null;
         }
         return {
-          name: doc.data().name,
-          img: doc.data().subcategoryimg
+          name: doc.data().name
         };
       })
     );
@@ -216,34 +254,27 @@ app.get('/products/:categoryName/:subcategoryName/:subsubcategoryName', async (r
     sdata.forEach(doc =>{      
       subcategoryId = doc.id;      
     })
-
     const categoryRef = db.collection(categoryName).doc(categoryId);
     const categoryDoc = await categoryRef.get();
-
     if (!categoryDoc.exists) {
       res.status(404).json({ error: 'Category not found' });
       return;
     }
-
     const subcategoryRef = categoryRef.collection(subcategoryName).doc(subcategoryId);
     const subcategoryDoc = await subcategoryRef.get();
-
     if (!subcategoryDoc.exists) {
       res.status(404).json({ error: 'Subcategory not found' });
       return;
     }
-
     const productsRef = subcategoryRef.collection(subsubcategoryName);
     const productsQuerySnapshot = await productsRef.get();
 
     const products = [];
     productsQuerySnapshot.forEach((doc) => {
-      const productData = doc.data();
       const product = {
         id: doc.id,
         title:doc.data().title,
         size:doc.data().size,
-        productImg:doc.data().productImg,
       };
       products.push(product);
     });
@@ -255,7 +286,45 @@ app.get('/products/:categoryName/:subcategoryName/:subsubcategoryName', async (r
   }
 });
 
+app.post('/file', upload.single('file'), async (req, res) => {
+  try {
+    const file = req.file;  
+  // Upload the file to Firebase Storage
+  const folderName = 'Images';
+  const bucket = admin.storage().bucket();
+  const fileName = `${folderName}/${file.originalname}`;
+  const fileUpload = bucket.file(fileName);
 
+  const blobStream = fileUpload.createWriteStream({
+    metadata: {
+      contentType: file.mimetype
+    }
+  });
+
+  blobStream.on('error', (error) => {
+    console.error('Error uploading file:', error);
+    res.status(500).json({ error: 'Failed to upload file.' });
+  });
+
+  blobStream.on('finish', () => {
+    // Generate download URL for the file
+    fileUpload.getSignedUrl({
+      action: 'read',
+      expires: '03-01-2500' // Adjust the expiration date as needed
+    }).then((signedUrls) => {
+      const downloadUrl = signedUrls[0];
+      res.status(200).json({ downloadUrl });
+    }).catch((error) => {
+      res.status(500).json({error});
+    });
+  });
+
+  blobStream.end(file.buffer);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send('Server error');
+  } 
+}); 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
