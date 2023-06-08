@@ -329,7 +329,22 @@ app.get('/products/:categoryName/:subcategoryName/:subsubcategoryName', async (r
     res.status(500).json({ error: 'Something went wrong' });
   }
 });
-
+app.delete('/deleteproduct/:collectionId1/:documentId/:collectionId2/:collectionId3/:productId', async (req, res) => {
+  const { collectionId1, documentId, collectionId2, collectionId3 ,productId} = req.params;
+  try {
+    const docPath = `${collectionId1}/${documentId}/${collectionId2}/${collectionId3}/${productId}`;
+    const docRef = db.collection('category 2').doc(docPath);
+    try {
+      await docRef.delete();
+    } catch (error) {
+      console.log(error)
+    }
+    res.status(200).send('Document deleted successfully.');
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    res.status(500).send('Error deleting document.');
+  }
+});
 app.post('/file', upload.single('file'), async (req, res) => {
   try {
     const file = req.file;  
