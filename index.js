@@ -52,6 +52,50 @@ app.get('/getinqury',async(req,res)=>{
         res.send(err)
     }
 })
+app.post('/contact',async(req,res)=>{
+    try{
+      const data = {name:req.body.name,email:req.body.email,message:req.body.message,subject:req.body.subject,contact:req.body.contact,created_on:new Date()};
+      const response = await db.collection("contact").doc().set(data)
+      res.send(response)
+    }catch(err){
+        res.send(err)
+    }
+})
+app.delete('/deletecontact/:id',async(req,res)=>{
+  try{
+      await db.collection("contact").doc(req.params.id).delete();
+      res.send('Contact record deleted successfuly');
+  }catch(err){
+      res.send(err)
+  } 
+})
+app.delete('/deleteinqury/:id',async(req,res)=>{
+  try{
+      await db.collection("inqury").doc(req.params.id).delete();
+      res.send('Inqury record deleted successfuly');
+  }catch(err){
+      res.send(err)
+  } 
+})
+app.get('/getcontact',async(req,res)=>{
+    try{
+        const contact =  db.collection("contact");
+        const data = await contact.get();
+        const contactArray = [];
+        if(data.empty) {
+            res.status(404).send('No Contact record found');
+        }else {
+            data.forEach(doc => {
+                const document = doc.data();
+                document.id = doc.id;
+                contactArray.push(document);
+            });
+            res.send(contactArray);
+        }
+    }catch(err){
+        res.send(err)
+    }
+})
 app.post('/products', async (req, res) => {
   try {
     const category = req.body.category;
