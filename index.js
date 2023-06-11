@@ -52,6 +52,14 @@ app.get('/getinqury',async(req,res)=>{
         res.send(err)
     }
 })
+app.delete('/deleteinqury/:id',async(req,res)=>{
+  try{
+      await db.collection("inqury").doc(req.params.id).delete();
+      res.send('Inqury record deleted successfuly');
+  }catch(err){
+      res.send(err)
+  } 
+})
 app.post('/contact',async(req,res)=>{
     try{
       const data = {name:req.body.name,email:req.body.email,message:req.body.message,subject:req.body.subject,contact:req.body.contact,created_on:new Date()};
